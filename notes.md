@@ -1,7 +1,14 @@
 # Muzz Task
 
 
-## Endpoints
+## API
+
+Started off with Gin for pure simplicity
+Echo has jwt auth built in
+Gin would need a plugin appleboy/gin-jwt but looks verbose
+
+
+### Endpoints
 
 
 GET /user/create

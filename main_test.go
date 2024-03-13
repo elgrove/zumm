@@ -37,11 +37,10 @@ func TestHelloWorldEndpoint(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code, "Expected 200")
 
-	want := `{"data":"hello world"}`
-	assert.Equal(t, want, w.Body.String(), "Expected hello json")
+	want := `{"hello":"world"}`
+	assert.JSONEq(t, want, w.Body.String(), "Expected hello json")
 }
 
-// TODO test for user create endpoint
 func TestUserCreateEndpoint(t *testing.T) {
 	testDB, cleanup := setupTestDB()
 	defer cleanup()

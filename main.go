@@ -4,28 +4,33 @@ import (
 	"net/http"
 	"zumm/models"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
-func setupRouter() *gin.Engine {
-	r := gin.Default()
-	initialiseRoutes(r)
-	return r
+func setupRouter() *echo.Echo {
+	e := echo.New()
+
+	configureMiddleware(e)
+	configureRoutes(e)
+	return e
 }
 
-func initialiseRoutes(r *gin.Engine) {
-	r.GET("/", helloWorldHandler)
-	r.GET("/user/create", userCreateHandler)
+func configureRoutes(e *echo.Echo) {
+	e.GET("/", helloWorldHandler)
+	e.GET("/user/create", userCreateHandler)
 }
 
-func helloWorldHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"data": "hello world"})
+func configureMiddleware(e *echo.Echo) {
 }
 
-func userCreateHandler(c *gin.Context) {
+func helloWorldHandler(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]interface{}{"hello": "world"})
+}
+
+func userCreateHandler(c echo.Context) error {
 	user := models.CreateRandomUser()
 	models.DB.Create(&user)
-	c.JSON(http.StatusOK, gin.H{
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"id":       user.ID,
 		"email":    user.Email,
 		"password": user.Password,
@@ -36,6 +41,7 @@ func userCreateHandler(c *gin.Context) {
 }
 
 func main() {
-	r := setupRouter()
-	r.Run()
+	e := setupRouter()
+	e.Logger.Fatal(e.Start(":8080"))
+
 }
