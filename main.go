@@ -23,10 +23,8 @@ func helloWorldHandler(c *gin.Context) {
 }
 
 func userCreateHandler(c *gin.Context) {
-	// new user from fakeit
-	// add user to db
-	// return response json (but only select fields)
 	user := models.CreateRandomUser()
+	models.DB.Create(&user)
 	c.JSON(http.StatusOK, gin.H{
 		"id":       user.ID,
 		"email":    user.Email,

@@ -24,7 +24,7 @@ func CreateRandomUser() User {
 		Name:     gofakeit.Name(),
 		Age:      gofakeit.Number(18, 100),
 		Gender:   gofakeit.Gender(),
-		Location: fmt.Sprintf("%d,%d", gofakeit.Latitude(), gofakeit.Longitude()),
+		Location: fmt.Sprintf("%f,%f", gofakeit.Latitude(), gofakeit.Longitude()),
 		Email:    gofakeit.Email(),
 		Password: gofakeit.Password(true, false, false, false, false, 12),
 	}
