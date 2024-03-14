@@ -19,7 +19,7 @@ Public and open
 POST /login
 Payload of a user id? or just GET token?
 Returns an auth token to use to auth against the other endpoints
-Public and open
+Public and openee
 
 GET /discover
 List all other users
@@ -27,7 +27,7 @@ Sorted by other user's distance from the user
 Add distance from the user to the returned payload
 Exclude users already swiped on
 Add a filter on age and gender
-Authenticate with token
+Authenticate with token 
 
 POST /swipe
 Payload of their user id and yes/no verdict
