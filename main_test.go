@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -18,6 +19,16 @@ func setupTestDB() (*gorm.DB, func()) {
 		panic("failed to connect database")
 	}
 	db.AutoMigrate(&models.User{})
+
+	user := models.User{
+		Name:     "John Smith",
+		Age:      25,
+		Gender:   "Male",
+		Location: "54.4,21.1",
+		Email:    "john@smith.com",
+		Password: "heungminson7",
+	}
+	db.Create(&user)
 
 	cleanup := func() {
 		sqlDB, _ := db.DB()
@@ -67,6 +78,42 @@ func TestUserCreateEndpoint(t *testing.T) {
 		var count int64
 		testDB.Model(&models.User{}).Count(&count)
 		assert.Equal(t, int64(1), count, "Expected 1 item in the user table")
+	})
+
+}
+
+func TestLoginEndpointSuccess(t *testing.T) {
+	_, cleanup := setupTestDB()
+	defer cleanup()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	userLogin := models.UserLogin{Email: "john@smith.com", Password: "heungminson7"}
+	jsonData, _ := json.Marshal(userLogin)
+	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+
+	t.Run("returns 200", func(t *testing.T) {
+		assert.Equal(t, http.StatusOK, w.Code, "Expected 200")
+	})
+
+}
+
+func TestLoginEndpointFailure(t *testing.T) {
+	_, cleanup := setupTestDB()
+	defer cleanup()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	userLogin := models.UserLogin{Email: "hacker@fake.com", Password: "unauthorised"}
+	jsonData, _ := json.Marshal(userLogin)
+	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+
+	t.Run("returns 401", func(t *testing.T) {
+		assert.Equal(t, http.StatusUnauthorized, w.Code, "Expected 401")
 	})
 
 }

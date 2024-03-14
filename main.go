@@ -5,6 +5,7 @@ import (
 	"zumm/models"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 func setupRouter() *echo.Echo {
@@ -18,9 +19,15 @@ func setupRouter() *echo.Echo {
 func configureRoutes(e *echo.Echo) {
 	e.GET("/", helloWorldHandler)
 	e.GET("/user/create", userCreateHandler)
+	e.POST("/login", LoginHandler)
 }
 
 func configureMiddleware(e *echo.Echo) {
+	// TODO you are here
+	// add a /login route posting email and pass and returning nothing
+	// then implement issueing jwt tokens
+	// then implement middleware and secure hello world with jwt
+
 }
 
 func helloWorldHandler(c echo.Context) error {
@@ -38,6 +45,27 @@ func userCreateHandler(c echo.Context) error {
 		"gender":   user.Gender,
 		"age":      user.Age,
 	})
+}
+
+func LoginHandler(c echo.Context) error {
+	var login models.UserLogin
+	err := c.Bind(&login)
+	if err != nil {
+		return c.String(http.StatusBadRequest, "bad request")
+	}
+	var user models.User
+	result := models.DB.Take(&user, "email = ?", login.Email)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Email or password incorrect"})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
+	}
+	if user.Password != login.Password {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Email or password incorrect"})
+	}
+
+	return c.String(http.StatusOK, "success")
 }
 
 func main() {
