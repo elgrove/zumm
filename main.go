@@ -2,11 +2,15 @@ package main
 
 import (
 	"net/http"
+	"time"
 	"zumm/models"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
+
+var jwtSecretKey = []byte("tottenhamhotspurfootballclub")
 
 func setupRouter() *echo.Echo {
 	e := echo.New()
@@ -65,7 +69,16 @@ func LoginHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Email or password incorrect"})
 	}
 
-	return c.String(http.StatusOK, "success")
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["email"] = user.Email
+	claims["name"] = user.Name
+	claims["age"] = user.Age
+	claims["gender"] = user.Gender
+	claims["exp"] = time.Now().AddDate(0, 3, 0).Unix() // 90 days
+	t, _ := token.SignedString(jwtSecretKey)
+
+	return c.JSON(http.StatusOK, map[string]string{"token": t})
 }
 
 func main() {

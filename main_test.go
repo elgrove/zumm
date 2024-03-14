@@ -8,6 +8,7 @@ import (
 	"testing"
 	"zumm/models"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -96,6 +97,28 @@ func TestLoginEndpointSuccess(t *testing.T) {
 
 	t.Run("returns 200", func(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code, "Expected 200")
+	})
+
+	t.Run("returns token JSON with claims", func(t *testing.T) {
+		responseJSON := w.Body.Bytes()
+		var tokenResponse models.TokenResponse
+		json.Unmarshal(responseJSON, &tokenResponse)
+
+		token, err := jwt.Parse(tokenResponse.Token, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, jwt.ErrSignatureInvalid
+			}
+			return []byte("tottenhamhotspurfootballclub"), nil
+		})
+
+		assert.NoError(t, err, "Expected token to parse without error")
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			assert.Equal(t, "john@smith.com", claims["email"], "Expected email in the claims")
+			assert.Equal(t, "John Smith", claims["name"], "Expected name in the claims")
+			assert.Equal(t, float64(25), claims["age"], "Expected age in the claims")
+			assert.Equal(t, "Male", claims["gender"], "Expected gender in the claims")
+		}
 	})
 
 }
