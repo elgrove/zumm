@@ -12,15 +12,17 @@ type UserLocation struct {
 }
 
 type User struct {
-	ID        uint `gorm:"primary_key"`
-	Name      string
-	Age       int
-	Gender    string
-	Location  UserLocation `gorm:"embedded"`
-	Email     string
-	Password  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID             uint `gorm:"primary_key"`
+	Name           string
+	Age            int
+	Gender         string
+	Location       UserLocation `gorm:"embedded"`
+	Email          string
+	Password       string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	SwipesMade     []Swipe `gorm:"foreignKey:SwiperID"`
+	SwipesReceived []Swipe `gorm:"foreignKey:SwipeeID"`
 }
 
 func CreateRandomUser() User {

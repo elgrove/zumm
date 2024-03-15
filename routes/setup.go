@@ -29,5 +29,6 @@ func configureRoutes(e *echo.Echo) {
 	e.GET("/user/create", userCreateHandler)
 	e.POST("/login", loginHandler)
 	e.POST("/discover", discoverHandler, jwtMiddleware)
+	e.POST("/swipe", swipeHandler, jwtMiddleware)
 
 }

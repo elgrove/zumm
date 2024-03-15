@@ -19,7 +19,7 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 	defer cleanup()
 	router := SetupRouter()
 	w := httptest.NewRecorder()
-	user := createTestUser()
+	user := CreateTestUser1()
 	requestData := models.DiscoverRequest{Location: user.Location, DesiredGender: "Female", DesiredAgeMin: 25, DesiredAgeMax: 35}
 	JSONData, _ := json.Marshal(requestData)
 	req, _ := http.NewRequest("POST", "/discover", bytes.NewBuffer(JSONData))
@@ -28,12 +28,12 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 	tokenString, _ := token.SignedString(JWTSecretKey)
 	tokenHeader := fmt.Sprintf("Bearer %s", tokenString)
 	req.Header.Add("Authorization", tokenHeader)
+	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
 	responseJSON := w.Body.Bytes()
 	var discoverResponse models.DiscoverResponse
 	parseErr := json.Unmarshal(responseJSON, &discoverResponse)
-	fmt.Println("1")
 
 	t.Run("returns 200", func(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code, "Expected 200")
@@ -50,7 +50,7 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 		assert.True(t, sorted, "Expected results to be sorted asc")
 	})
 
-	t.Run("returns results filtered by age as specified in posted JSON", func(t *testing.T) {
+	t.Run("returns results filtered by age specified in posted JSON", func(t *testing.T) {
 		for _, user := range discoverResponse.Results {
 			if user.Age < requestData.DesiredAgeMin || user.Age > requestData.DesiredAgeMax {
 				assert.FailNow(t, "Expected results to be filtered by specified age")
@@ -58,7 +58,7 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 		}
 	})
 
-	t.Run("returns results filtered by gender as specified in posted JSON", func(t *testing.T) {
+	t.Run("returns results filtered by gender specified in posted JSON", func(t *testing.T) {
 		for _, user := range discoverResponse.Results {
 			if user.Gender != requestData.DesiredGender {
 				assert.FailNow(t, "Expected results to be filtered by specified gender")

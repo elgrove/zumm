@@ -18,7 +18,7 @@ func TestLoginEndpointSuccess(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 
-	user := createTestUser()
+	user := CreateTestUser1()
 	userLogin := models.LoginRequest{Email: user.Email, Password: user.Password}
 	jsonData, _ := json.Marshal(userLogin)
 	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))

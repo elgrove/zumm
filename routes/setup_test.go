@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func createTestUser() models.User {
+func CreateTestUser1() models.User {
 	location := models.UserLocation{Latitude: 51.5080, Longitude: -0.11758}
 	user := models.User{
 		Name:     "John Smith",
@@ -20,9 +20,34 @@ func createTestUser() models.User {
 	return user
 }
 
-func addTestUser(db *gorm.DB) {
-	user := createTestUser()
-	db.Create(&user)
+func CreateTestUser2() models.User {
+	location := models.UserLocation{Latitude: 51.5080, Longitude: -0.11758}
+	user := models.User{
+		Name:     "Jane Wilson",
+		Age:      24,
+		Gender:   "Female",
+		Location: location,
+		Email:    "jane@wilson.com",
+		Password: "richarlison9",
+	}
+	return user
+}
+
+func addTestUsers(db *gorm.DB) {
+	user1 := CreateTestUser1()
+	db.Create(&user1)
+	user2 := CreateTestUser2()
+	db.Create(&user2)
+}
+
+func addTestSwipeMatch(db *gorm.DB) {
+	janeForJohn := models.Swipe{SwiperID: 2, SwipeeID: 1, Interested: true}
+	db.Create(&janeForJohn)
+}
+
+func addTestSwipeNoMatch(db *gorm.DB) {
+	janeNotForJohn := models.Swipe{SwiperID: 2, SwipeeID: 1, Interested: false}
+	db.Create(&janeNotForJohn)
 }
 
 func addRandomUsers(db *gorm.DB, count int) {
@@ -39,8 +64,8 @@ func setupTestDB() (*gorm.DB, func()) {
 	if err != nil {
 		panic("failed to create inmemory test db")
 	}
-	db.AutoMigrate(&models.User{})
-	addTestUser(db)
+	db.AutoMigrate(&models.User{}, &models.Swipe{})
+	addTestUsers(db)
 	addRandomUsers(db, 500)
 	models.SetDB(db)
 

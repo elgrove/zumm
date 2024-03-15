@@ -79,3 +79,5 @@ Fundamentals:
 - debugging
 - symmetric encryption -> jwt
 - choosing a framework
+- trunk dev branch
+- conventional commits
