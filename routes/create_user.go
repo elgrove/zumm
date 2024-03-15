@@ -10,6 +10,7 @@ import (
 func userCreateHandler(c echo.Context) error {
 	user := models.CreateRandomUser()
 	models.DB.Create(&user)
+	// TODO return {result : {user}}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"id":       user.ID,
 		"email":    user.Email,

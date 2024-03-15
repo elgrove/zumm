@@ -30,12 +30,3 @@ func CreateRandomUser() User {
 	}
 	return user
 }
-
-type UserLogin struct {
-	Email    string
-	Password string
-}
-
-type TokenResponse struct {
-	Token string
-}

@@ -25,9 +25,10 @@ GET /discover
 List all other users
 Sorted by other user's distance from the user
 Add distance from the user to the returned payload
-Exclude users already swiped on
-Add a filter on age and gender
 Authenticate with token 
+EXTEND: Exclude users already swiped on
+EXTEND: Add a filter on age and gender
+BONUS: attractiveness model
 
 POST /swipe
 Payload of their user id and yes/no verdict
@@ -70,3 +71,12 @@ Token authentication
 Keep it basic. Symmetric encryption using a private secret
 This is basically what JWT is
 https://github.com/golang-jwt/jwt
+
+
+
+Fundamentals:
+- data modelling
+- tdd
+- symmetric encryption -> jwt
+- choosing a framework
+- 

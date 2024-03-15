@@ -10,7 +10,7 @@ import (
 )
 
 func loginHandler(c echo.Context) error {
-	var login models.UserLogin
+	var login models.LoginRequest
 	err := c.Bind(&login)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
@@ -27,12 +27,8 @@ func loginHandler(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["email"] = user.Email
-	claims["name"] = user.Name
-	claims["age"] = user.Age
-	claims["gender"] = user.Gender
+	claims := models.UserClaims{jwt.RegisteredClaims{}, user}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, _ := token.SignedString(JWTSecretKey)
 
 	return c.JSON(http.StatusOK, map[string]string{"token": t})

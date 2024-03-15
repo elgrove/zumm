@@ -8,7 +8,7 @@ import (
 	"testing"
 	"zumm/models"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +18,8 @@ func TestLoginEndpointSuccess(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 
-	userLogin := models.UserLogin{Email: "john@smith.com", Password: "heungminson7"}
+	user := createTestUser()
+	userLogin := models.LoginRequest{Email: user.Email, Password: user.Password}
 	jsonData, _ := json.Marshal(userLogin)
 	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
@@ -30,7 +31,7 @@ func TestLoginEndpointSuccess(t *testing.T) {
 
 	t.Run("returns token JSON with claims", func(t *testing.T) {
 		responseJSON := w.Body.Bytes()
-		var tokenResponse models.TokenResponse
+		var tokenResponse models.LoginResponse
 		json.Unmarshal(responseJSON, &tokenResponse)
 		token, err := jwt.Parse(tokenResponse.Token, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -39,11 +40,11 @@ func TestLoginEndpointSuccess(t *testing.T) {
 			return []byte("tottenhamhotspurfootballclub"), nil
 		})
 		assert.NoError(t, err, "Expected token to parse without error")
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			assert.Equal(t, "john@smith.com", claims["email"], "Expected email in the claims")
-			assert.Equal(t, "John Smith", claims["name"], "Expected name in the claims")
-			assert.Equal(t, float64(25), claims["age"], "Expected age in the claims")
-			assert.Equal(t, "Male", claims["gender"], "Expected gender in the claims")
+		if claims, ok := token.Claims.(models.UserClaims); ok && token.Valid {
+			assert.Equal(t, user.Email, claims.Email, "Expected email in the claims")
+			assert.Equal(t, user.Name, claims.Name, "Expected name in the claims")
+			assert.Equal(t, user.Age, claims.Age, "Expected age in the claims")
+			assert.Equal(t, user.Gender, claims.Gender, "Expected gender in the claims")
 		}
 	})
 }
@@ -54,7 +55,7 @@ func TestLoginEndpointFailure(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 
-	userLogin := models.UserLogin{Email: "hacker@fake.com", Password: "unauthorised"}
+	userLogin := models.LoginRequest{Email: "hacker@fake.com", Password: "unauthorised"}
 	jsonData, _ := json.Marshal(userLogin)
 	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
