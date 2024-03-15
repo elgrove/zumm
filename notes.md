@@ -77,6 +77,6 @@ https://github.com/golang-jwt/jwt
 Fundamentals:
 - data modelling
 - tdd
+- debugging
 - symmetric encryption -> jwt
 - choosing a framework
-- 

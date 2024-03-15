@@ -28,6 +28,6 @@ func configureRoutes(e *echo.Echo) {
 	e.GET("/", canaryHandler)
 	e.GET("/user/create", userCreateHandler)
 	e.POST("/login", loginHandler)
-	e.GET("/discover", discoverHandler, jwtMiddleware)
+	e.POST("/discover", discoverHandler, jwtMiddleware)
 
 }

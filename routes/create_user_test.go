@@ -33,9 +33,9 @@ func TestUserCreateEndpoint(t *testing.T) {
 	})
 
 	t.Run("inserts user into DB", func(t *testing.T) {
-		var count int64
-		testDB.Model(&models.User{}).Count(&count)
-		assert.Equal(t, int64(2), count, "Expected 2 item in the user table, John Smith + the created user")
+		var JohnSmith models.User
+		testDB.First(&JohnSmith)
+		assert.Equal(t, "john@smith.com", JohnSmith.Email, "Expected the test user John Smith to be present in db")
 	})
 
 }

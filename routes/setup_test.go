@@ -8,11 +8,12 @@ import (
 )
 
 func createTestUser() models.User {
+	location := models.UserLocation{Latitude: 51.5080, Longitude: -0.11758}
 	user := models.User{
 		Name:     "John Smith",
 		Age:      25,
 		Gender:   "Male",
-		Location: "51.584, -0.0473",
+		Location: location,
 		Email:    "john@smith.com",
 		Password: "heungminson7",
 	}
@@ -24,6 +25,15 @@ func addTestUser(db *gorm.DB) {
 	db.Create(&user)
 }
 
+func addRandomUsers(db *gorm.DB, count int) {
+	randomUsers := make([]models.User, 0, count)
+	for i := 0; i < count; i++ {
+		user := models.CreateRandomUser()
+		randomUsers = append(randomUsers, user)
+	}
+	db.Create(&randomUsers)
+}
+
 func setupTestDB() (*gorm.DB, func()) {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	if err != nil {
@@ -31,6 +41,7 @@ func setupTestDB() (*gorm.DB, func()) {
 	}
 	db.AutoMigrate(&models.User{})
 	addTestUser(db)
+	addRandomUsers(db, 500)
 	models.SetDB(db)
 
 	cleanup := func() {
