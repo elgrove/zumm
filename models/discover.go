@@ -13,5 +13,8 @@ type DiscoverResponse struct {
 }
 
 type DiscoverRequest struct {
-	Location UserLocation
+	Location      UserLocation
+	DesiredGender string
+	DesiredAgeMin int
+	DesiredAgeMax int
 }

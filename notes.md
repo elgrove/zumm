@@ -17,18 +17,17 @@ Use a faker type library to generate fake names etc
 Public and open
 
 POST /login
-Payload of a user id? or just GET token?
 Returns an auth token to use to auth against the other endpoints
 Public and openee
 
 GET /discover
-List all other users
-Sorted by other user's distance from the user
-Add distance from the user to the returned payload
-Authenticate with token 
-EXTEND: Exclude users already swiped on
-EXTEND: Add a filter on age and gender
-BONUS: attractiveness model
+- [x] List all other users
+- [x] Sorted by other user's distance from the user
+- [x] Add distance from the user to the returned payload
+- [x] Authenticate with token 
+- [x] EXTEND: Add a filter on age and gender
+- [ ] EXTEND: Exclude users already swiped on
+- [ ] BONUS: attractiveness model
 
 POST /swipe
 Payload of their user id and yes/no verdict

@@ -15,19 +15,23 @@ func discoverHandler(c echo.Context) error {
 	var requestData models.DiscoverRequest
 	c.Bind(&requestData)
 	claims := token.Claims.(*models.UserClaims)
+
 	var callingUser models.User
 	models.DB.Take(&callingUser, "email = ?", claims.User.Email)
-	var allOtherUsers []models.User
-	models.DB.Where("ID <> ?", callingUser.ID).Find(&allOtherUsers)
+	var possibleDiscoverUsers []models.User
+	models.DB.
+		Where("ID <> ?", callingUser.ID).
+		Where("Gender = ?", requestData.DesiredGender).
+		Where("Age BETWEEN ? AND ?", requestData.DesiredAgeMin, requestData.DesiredAgeMax).
+		Find(&possibleDiscoverUsers)
 
 	type UserDistance struct {
 		User     models.User
 		Distance float64
 	}
-
 	var usersWithDistance []UserDistance
 
-	for _, user := range allOtherUsers {
+	for _, user := range possibleDiscoverUsers {
 		distance := haversine.Distance(
 			haversine.NewCoordinates(callingUser.Location.Latitude, callingUser.Location.Longitude),
 			haversine.NewCoordinates(user.Location.Latitude, user.Location.Longitude),

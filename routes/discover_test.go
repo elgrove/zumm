@@ -20,7 +20,7 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 	user := createTestUser()
-	requestData := models.DiscoverRequest{Location: user.Location}
+	requestData := models.DiscoverRequest{Location: user.Location, DesiredGender: "Female", DesiredAgeMin: 25, DesiredAgeMax: 35}
 	JSONData, _ := json.Marshal(requestData)
 	req, _ := http.NewRequest("POST", "/discover", bytes.NewBuffer(JSONData))
 	claims := models.UserClaims{jwt.RegisteredClaims{}, user}
@@ -48,6 +48,22 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 			return discoverResponse.Results[i].DistanceFromMe < discoverResponse.Results[j].DistanceFromMe
 		})
 		assert.True(t, sorted, "Expected results to be sorted asc")
+	})
+
+	t.Run("returns results filtered by age as specified in posted JSON", func(t *testing.T) {
+		for _, user := range discoverResponse.Results {
+			if user.Age < requestData.DesiredAgeMin || user.Age > requestData.DesiredAgeMax {
+				assert.FailNow(t, "Expected results to be filtered by specified age")
+			}
+		}
+	})
+
+	t.Run("returns results filtered by gender as specified in posted JSON", func(t *testing.T) {
+		for _, user := range discoverResponse.Results {
+			if user.Gender != requestData.DesiredGender {
+				assert.FailNow(t, "Expected results to be filtered by specified gender")
+			}
+		}
 	})
 
 }
