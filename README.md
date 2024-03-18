@@ -2,6 +2,8 @@
 
 ## Background
 
+**This application is deployed at www.lgrv.net.**
+
 This is a technical exercise produced for a company whose product is a niche dating app. It is built with Go 1.22 and the Echo framework.
 
 This is the first Go project I have worked on, having come from a Python background, which was really interesting as it meant I had to strip all language and framework away in my brain and rely on fundamentals.
