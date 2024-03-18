@@ -19,7 +19,7 @@ func addTestSwipeMatch(db *gorm.DB) {
 	db.Create(&janeForJohn)
 }
 
-// getTestUsers queries from the DB and returns john, jane in that order.
+// getTestUsers queries the DB and returns john, jane in that order.
 func getTestUsers(db *gorm.DB) (model.User, model.User) {
 	var john model.User
 	db.Where("id = ?", 1).Take(&john)

@@ -1,6 +1,8 @@
 package route
 
 import (
+	"fmt"
+	"log/slog"
 	"net/http"
 	"sort"
 	"zumm/internal/model"
@@ -20,9 +22,13 @@ func DiscoverHandler(c echo.Context) error {
 	var requestData model.DiscoverRequest
 	c.Bind(&requestData)
 	claims := token.Claims.(*model.UserClaims)
-
+	slog.Debug(fmt.Sprintf("Requested received to /discover from user %d", claims.User.ID))
 	var callingUser model.User
 	model.DB.Take(&callingUser, "email = ?", claims.User.Email)
+
+	var allUsers []model.User
+	model.DB.
+		Find(&allUsers)
 
 	var possibleDiscoverUsers []model.User
 	model.DB.

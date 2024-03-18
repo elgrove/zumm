@@ -13,9 +13,9 @@ import (
 // createTestUser is used to create standard test users, rather than totally random.
 func createTestUser(firstname, lastname string, male bool) model.User {
 	location := model.UserLocation{Latitude: 51.5080, Longitude: -0.11758}
-	gender := "Male"
+	gender := "male"
 	if !male {
-		gender = "Female"
+		gender = "female"
 	}
 	user := model.User{
 		Name:     fmt.Sprintf("%s %s", firstname, lastname),

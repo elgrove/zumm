@@ -12,7 +12,7 @@ import (
 
 // SwipeHandler provides a HTTP interface to register a swipe, i.e. one user's
 // verdict on if they are interested in another user or not.
-// The Swipe is inserted and th
+// The Swipe is inserted and, if interested, we check if the swipee was also interested.
 func SwipeHandler(c echo.Context) error {
 	var swipe model.Swipe
 	c.Bind(&swipe)

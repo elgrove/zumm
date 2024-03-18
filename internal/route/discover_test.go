@@ -22,7 +22,7 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 	user := createTestUser("John", "Smith", true)
-	requestData := model.DiscoverRequest{Location: user.Location, DesiredGender: "Female", DesiredAgeMin: 25, DesiredAgeMax: 35}
+	requestData := model.DiscoverRequest{Location: user.Location, DesiredGender: "female", DesiredAgeMin: 18, DesiredAgeMax: 100}
 	JSONData, _ := json.Marshal(requestData)
 	req, _ := http.NewRequest("POST", "/discover", bytes.NewBuffer(JSONData))
 	tokenHeader := getTokenHeaderForUser(user)
