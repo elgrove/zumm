@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"time"
@@ -26,7 +26,6 @@ type User struct {
 }
 
 func CreateRandomUser() User {
-	// roughly within Greater London/M25
 	lat, _ := gofakeit.LatitudeInRange(51.245, 51.759)
 	long, _ := gofakeit.LongitudeInRange(-0.302, 0.285)
 	location := UserLocation{Latitude: lat, Longitude: long}

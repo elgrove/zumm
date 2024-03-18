@@ -1,15 +1,15 @@
-package routes
+package route
 
 import (
 	"net/http"
-	"zumm/models"
+	"zumm/internal/model"
 
 	"github.com/labstack/echo/v4"
 )
 
-func userCreateHandler(c echo.Context) error {
-	user := models.CreateRandomUser()
-	models.DB.Create(&user)
+func UserCreateHandler(c echo.Context) error {
+	user := model.CreateRandomUser()
+	model.DB.Create(&user)
 	// TODO return {result : {user}}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"id":       user.ID,

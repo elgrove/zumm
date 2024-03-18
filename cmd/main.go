@@ -1,10 +1,10 @@
 package main
 
 import (
-	"zumm/routes"
+	"zumm/internal/route"
 )
 
 func main() {
-	e := routes.SetupRouter()
+	e := route.SetupRouter()
 	e.Logger.Fatal(e.Start(":8080"))
 }

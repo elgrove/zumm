@@ -1,16 +1,14 @@
-package routes
+package route
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"testing"
-	"zumm/models"
+	"zumm/internal/model"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,20 +17,17 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 	defer cleanup()
 	router := SetupRouter()
 	w := httptest.NewRecorder()
-	user := CreateTestUser1()
-	requestData := models.DiscoverRequest{Location: user.Location, DesiredGender: "Female", DesiredAgeMin: 25, DesiredAgeMax: 35}
+	user := createTestUser("John", "Smith", true)
+	requestData := model.DiscoverRequest{Location: user.Location, DesiredGender: "Female", DesiredAgeMin: 25, DesiredAgeMax: 35}
 	JSONData, _ := json.Marshal(requestData)
 	req, _ := http.NewRequest("POST", "/discover", bytes.NewBuffer(JSONData))
-	claims := models.UserClaims{jwt.RegisteredClaims{}, user}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(JWTSecretKey)
-	tokenHeader := fmt.Sprintf("Bearer %s", tokenString)
+	tokenHeader := getTokenHeaderForUser(user)
 	req.Header.Add("Authorization", tokenHeader)
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
 	responseJSON := w.Body.Bytes()
-	var discoverResponse models.DiscoverResponse
+	var discoverResponse model.DiscoverResponse
 	parseErr := json.Unmarshal(responseJSON, &discoverResponse)
 
 	t.Run("returns 200", func(t *testing.T) {
@@ -78,4 +73,5 @@ func TestDiscoverEndpointFailure(t *testing.T) {
 	t.Run("returns 401", func(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, w.Code, "Expected 401")
 	})
+
 }

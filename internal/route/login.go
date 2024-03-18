@@ -1,22 +1,22 @@
-package routes
+package route
 
 import (
 	"net/http"
-	"zumm/models"
+	"zumm/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
-func loginHandler(c echo.Context) error {
-	var login models.LoginRequest
+func LoginHandler(c echo.Context) error {
+	var login model.LoginRequest
 	err := c.Bind(&login)
 	if err != nil {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
-	var user models.User
-	result := models.DB.Take(&user, "email = ?", login.Email)
+	var user model.User
+	result := model.DB.Take(&user, "email = ?", login.Email)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return c.NoContent(http.StatusUnauthorized)
@@ -27,9 +27,10 @@ func loginHandler(c echo.Context) error {
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
-	claims := models.UserClaims{jwt.RegisteredClaims{}, user}
+	claims := model.UserClaims{jwt.RegisteredClaims{}, user}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	t, _ := token.SignedString(JWTSecretKey)
 
-	return c.JSON(http.StatusOK, map[string]string{"token": t})
+	response := model.LoginResponse{Token: t}
+	return c.JSON(http.StatusOK, response)
 }

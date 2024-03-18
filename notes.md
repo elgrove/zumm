@@ -1,5 +1,15 @@
 # Muzz Task
 
+TODO
+- [ ] logging, structured log output
+- [ ] refactor folders
+- [ ] docstrings
+- [ ] actual run for real locally
+- [ ] dockerise
+- [ ] deploy to lgrv.net
+- [ ] cicd to deploy from main?
+- [ ] documentation/readme
+- [ ] all tests and code use same patterns
 
 ## API
 

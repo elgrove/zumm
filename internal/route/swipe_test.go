@@ -1,41 +1,50 @@
-package routes
+package route
 
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"zumm/models"
+	"zumm/internal/model"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
+
+func addTestSwipeMatch(db *gorm.DB) {
+	janeForJohn := model.Swipe{SwiperID: 2, SwipeeID: 1, Interested: true}
+	db.Create(&janeForJohn)
+}
+
+func getTestUsers(db *gorm.DB) (model.User, model.User) {
+	var john model.User
+	db.Where("id = ?", 1).Take(&john)
+	var jane model.User
+	db.Where("id = ?", 2).Take(&jane)
+	return john, jane
+}
 
 func TestSwipeEndpointSuccessMatch(t *testing.T) {
 	testDB, cleanup := setupTestDB()
 	defer cleanup()
 	addTestSwipeMatch(testDB)
+
 	router := SetupRouter()
 	w := httptest.NewRecorder()
-	var john models.User
-	testDB.Where("id = ?", 1).Take(&john)
-	var jane models.User
-	testDB.Where("id = ?", 2).Take(&jane)
-	requestData := models.Swipe{SwiperID: john.ID, SwipeeID: jane.ID, Interested: true}
+
+	john, jane := getTestUsers(testDB)
+	requestData := model.Swipe{SwiperID: john.ID, SwipeeID: jane.ID, Interested: true}
 	JSONData, _ := json.Marshal(requestData)
 	req, _ := http.NewRequest("POST", "/swipe", bytes.NewBuffer(JSONData))
-	claims := models.UserClaims{jwt.RegisteredClaims{}, john}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(JWTSecretKey)
-	tokenHeader := fmt.Sprintf("Bearer %s", tokenString)
+	tokenHeader := getTokenHeaderForUser(john)
 	req.Header.Add("Authorization", tokenHeader)
 	req.Header.Set("Content-Type", "application/json")
+
 	router.ServeHTTP(w, req)
 
 	responseJSON := w.Body.Bytes()
-	var swipeResponse models.SwipeResponse
+	var swipeResponse model.SwipeResponse
 	parseErr := json.Unmarshal(responseJSON, &swipeResponse)
 
 	t.Run("returns 200", func(t *testing.T) {
@@ -43,7 +52,7 @@ func TestSwipeEndpointSuccessMatch(t *testing.T) {
 	})
 
 	t.Run("inserts swipe to db", func(t *testing.T) {
-		var swipes []models.Swipe
+		var swipes []model.Swipe
 		testDB.
 			Where("swiper_id = ?", requestData.SwiperID).
 			Where("swipee_id = ?", requestData.SwipeeID).
@@ -64,27 +73,22 @@ func TestSwipeEndpointSuccessMatch(t *testing.T) {
 func TestSwipeEndpointSuccessNoMatch(t *testing.T) {
 	testDB, cleanup := setupTestDB()
 	defer cleanup()
-	addTestSwipeNoMatch(testDB)
 
 	router := SetupRouter()
 	w := httptest.NewRecorder()
-	var john models.User
-	testDB.Where("id = ?", 1).Take(&john)
-	var jane models.User
-	testDB.Where("id = ?", 2).Take(&jane)
-	requestData := models.Swipe{SwiperID: john.ID, SwipeeID: jane.ID, Interested: false}
+
+	john, jane := getTestUsers(testDB)
+	requestData := model.Swipe{SwiperID: john.ID, SwipeeID: jane.ID, Interested: false}
 	JSONData, _ := json.Marshal(requestData)
 	req, _ := http.NewRequest("POST", "/swipe", bytes.NewBuffer(JSONData))
-	claims := models.UserClaims{jwt.RegisteredClaims{}, john}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(JWTSecretKey)
-	tokenHeader := fmt.Sprintf("Bearer %s", tokenString)
+	tokenHeader := getTokenHeaderForUser(john)
 	req.Header.Add("Authorization", tokenHeader)
 	req.Header.Set("Content-Type", "application/json")
+
 	router.ServeHTTP(w, req)
 
 	responseJSON := w.Body.Bytes()
-	var swipeResponse models.SwipeResponse
+	var swipeResponse model.SwipeResponse
 	parseErr := json.Unmarshal(responseJSON, &swipeResponse)
 
 	t.Run("returns 200", func(t *testing.T) {
@@ -92,7 +96,7 @@ func TestSwipeEndpointSuccessNoMatch(t *testing.T) {
 	})
 
 	t.Run("inserts swipe to db", func(t *testing.T) {
-		var swipes []models.Swipe
+		var swipes []model.Swipe
 		testDB.
 			Where("swiper_id = ?", requestData.SwiperID).
 			Where("swipee_id = ?", requestData.SwipeeID).
@@ -110,3 +114,5 @@ func TestSwipeEndpointSuccessNoMatch(t *testing.T) {
 		assert.Nil(t, swipeResponse.Results.MatchID)
 	})
 }
+
+// TODO swipe failure

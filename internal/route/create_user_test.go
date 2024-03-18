@@ -1,11 +1,11 @@
-package routes
+package route
 
 import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"zumm/models"
+	"zumm/internal/model"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,9 +23,9 @@ func TestUserCreateEndpoint(t *testing.T) {
 	})
 
 	t.Run("returns user-like JSON", func(t *testing.T) {
-		responseJSON := w.Body.String()
-		var user models.User
-		err := json.Unmarshal([]byte(responseJSON), &user)
+		responseJSON := w.Body.Bytes()
+		var user model.User
+		err := json.Unmarshal(responseJSON, &user)
 		if err != nil {
 			t.Fatalf("Error parsing JSON: %v", err)
 		}
@@ -33,7 +33,7 @@ func TestUserCreateEndpoint(t *testing.T) {
 	})
 
 	t.Run("inserts user into DB", func(t *testing.T) {
-		var JohnSmith models.User
+		var JohnSmith model.User
 		testDB.First(&JohnSmith)
 		assert.Equal(t, "john@smith.com", JohnSmith.Email, "Expected the test user John Smith to be present in db")
 	})

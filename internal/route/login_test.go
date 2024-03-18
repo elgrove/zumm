@@ -1,4 +1,4 @@
-package routes
+package route
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"zumm/models"
+	"zumm/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
@@ -18,8 +18,8 @@ func TestLoginEndpointSuccess(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 
-	user := CreateTestUser1()
-	userLogin := models.LoginRequest{Email: user.Email, Password: user.Password}
+	user := createTestUser("John", "Smith", true)
+	userLogin := model.LoginRequest{Email: user.Email, Password: user.Password}
 	jsonData, _ := json.Marshal(userLogin)
 	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
@@ -31,7 +31,7 @@ func TestLoginEndpointSuccess(t *testing.T) {
 
 	t.Run("returns token JSON with claims", func(t *testing.T) {
 		responseJSON := w.Body.Bytes()
-		var tokenResponse models.LoginResponse
+		var tokenResponse model.LoginResponse
 		json.Unmarshal(responseJSON, &tokenResponse)
 		token, err := jwt.Parse(tokenResponse.Token, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -40,7 +40,7 @@ func TestLoginEndpointSuccess(t *testing.T) {
 			return []byte("tottenhamhotspurfootballclub"), nil
 		})
 		assert.NoError(t, err, "Expected token to parse without error")
-		if claims, ok := token.Claims.(models.UserClaims); ok && token.Valid {
+		if claims, ok := token.Claims.(model.UserClaims); ok && token.Valid {
 			assert.Equal(t, user.Email, claims.Email, "Expected email in the claims")
 			assert.Equal(t, user.Name, claims.Name, "Expected name in the claims")
 			assert.Equal(t, user.Age, claims.Age, "Expected age in the claims")
@@ -55,7 +55,7 @@ func TestLoginEndpointFailure(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()
 
-	userLogin := models.LoginRequest{Email: "hacker@fake.com", Password: "unauthorised"}
+	userLogin := model.LoginRequest{Email: "hacker@fake.com", Password: "unauthorised"}
 	jsonData, _ := json.Marshal(userLogin)
 	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")

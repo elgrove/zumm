@@ -1,7 +1,7 @@
-package routes
+package route
 
 import (
-	"zumm/models"
+	"zumm/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -19,16 +19,16 @@ func SetupRouter() *echo.Echo {
 func configureRoutes(e *echo.Echo) {
 	jwtConfig := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(models.UserClaims)
+			return new(model.UserClaims)
 		},
 		SigningKey: JWTSecretKey,
 	}
 	jwtMiddleware := echojwt.WithConfig(jwtConfig)
 
-	e.GET("/", canaryHandler)
-	e.GET("/user/create", userCreateHandler)
-	e.POST("/login", loginHandler)
-	e.POST("/discover", discoverHandler, jwtMiddleware)
-	e.POST("/swipe", swipeHandler, jwtMiddleware)
+	e.GET("/", CanaryHandler)
+	e.GET("/user/create", UserCreateHandler)
+	e.POST("/login", LoginHandler)
+	e.POST("/discover", DiscoverHandler, jwtMiddleware)
+	e.POST("/swipe", SwipeHandler, jwtMiddleware)
 
 }

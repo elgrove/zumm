@@ -1,4 +1,4 @@
-package models
+package model
 
 type Swipe struct {
 	ID         uint `gorm:"primary_key"`

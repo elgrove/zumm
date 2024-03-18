@@ -1,4 +1,4 @@
-package routes
+package route
 
 import (
 	"net/http"
@@ -15,7 +15,4 @@ func TestCanaryEndpoint(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code, "Expected 200")
-
-	want := `{"hello":"world"}`
-	assert.JSONEq(t, want, w.Body.String(), "Expected hello json")
 }

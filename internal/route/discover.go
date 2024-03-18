@@ -1,32 +1,32 @@
-package routes
+package route
 
 import (
 	"net/http"
 	"sort"
-	"zumm/models"
+	"zumm/internal/model"
 
 	"github.com/LucaTheHacker/go-haversine"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
-func discoverHandler(c echo.Context) error {
+func DiscoverHandler(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
-	var requestData models.DiscoverRequest
+	var requestData model.DiscoverRequest
 	c.Bind(&requestData)
-	claims := token.Claims.(*models.UserClaims)
+	claims := token.Claims.(*model.UserClaims)
 
-	var callingUser models.User
-	models.DB.Take(&callingUser, "email = ?", claims.User.Email)
-	var possibleDiscoverUsers []models.User
-	models.DB.
+	var callingUser model.User
+	model.DB.Take(&callingUser, "email = ?", claims.User.Email)
+	var possibleDiscoverUsers []model.User
+	model.DB.
 		Where("ID <> ?", callingUser.ID).
 		Where("Gender = ?", requestData.DesiredGender).
 		Where("Age BETWEEN ? AND ?", requestData.DesiredAgeMin, requestData.DesiredAgeMax).
 		Find(&possibleDiscoverUsers)
 
 	type UserDistance struct {
-		User     models.User
+		User     model.User
 		Distance float64
 	}
 	var usersWithDistance []UserDistance
@@ -43,9 +43,9 @@ func discoverHandler(c echo.Context) error {
 		return usersWithDistance[i].Distance < usersWithDistance[j].Distance
 	})
 
-	var discoverUserProfiles []models.DiscoverUserProfile
+	var discoverUserProfiles []model.DiscoverUserProfile
 	for _, uwd := range usersWithDistance {
-		discoverProfile := models.DiscoverUserProfile{
+		discoverProfile := model.DiscoverUserProfile{
 			ID:             uwd.User.ID,
 			Name:           uwd.User.Name,
 			Gender:         uwd.User.Gender,
