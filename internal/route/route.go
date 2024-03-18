@@ -1,3 +1,5 @@
+// Package routes instantiates and defines the API endpoint router for this application.
+// Endpoints requiring authentication have been secured with JWT using Echo's built-in middleware
 package route
 
 import (
@@ -8,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var JWTSecretKey = []byte("tottenhamhotspurfootballclub")
+var JWTokenSecretKey = []byte("tottenhamhotspurfootballclub")
 
 func SetupRouter() *echo.Echo {
 	e := echo.New()
@@ -16,19 +18,22 @@ func SetupRouter() *echo.Echo {
 	return e
 }
 
-func configureRoutes(e *echo.Echo) {
-	jwtConfig := echojwt.Config{
+func JWTokenConfig() echojwt.Config {
+	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(model.UserClaims)
 		},
-		SigningKey: JWTSecretKey,
+		SigningKey: JWTokenSecretKey,
 	}
-	jwtMiddleware := echojwt.WithConfig(jwtConfig)
+	return config
+}
+
+func configureRoutes(e *echo.Echo) {
+	jwtMiddleware := echojwt.WithConfig(JWTokenConfig())
 
 	e.GET("/", CanaryHandler)
 	e.GET("/user/create", UserCreateHandler)
 	e.POST("/login", LoginHandler)
 	e.POST("/discover", DiscoverHandler, jwtMiddleware)
 	e.POST("/swipe", SwipeHandler, jwtMiddleware)
-
 }

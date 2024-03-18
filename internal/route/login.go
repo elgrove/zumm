@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// LoginHandler provides a HTTP interface to authenticate a user, taking email and password
+// and returning a JWT which can be used to authenticate on protected routes.
 func LoginHandler(c echo.Context) error {
 	var login model.LoginRequest
 	err := c.Bind(&login)
@@ -29,7 +31,7 @@ func LoginHandler(c echo.Context) error {
 
 	claims := model.UserClaims{jwt.RegisteredClaims{}, user}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, _ := token.SignedString(JWTSecretKey)
+	t, _ := token.SignedString(JWTokenSecretKey)
 
 	response := model.LoginResponse{Token: t}
 	return c.JSON(http.StatusOK, response)

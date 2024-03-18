@@ -12,11 +12,14 @@ import (
 	"gorm.io/gorm"
 )
 
+// addTestSwipeMatch is a test fixture which adds a swipe of the two test users (John and Jane)
+// where Jane is interested in John.
 func addTestSwipeMatch(db *gorm.DB) {
 	janeForJohn := model.Swipe{SwiperID: 2, SwipeeID: 1, Interested: true}
 	db.Create(&janeForJohn)
 }
 
+// getTestUsers queries from the DB and returns john, jane in that order.
 func getTestUsers(db *gorm.DB) (model.User, model.User) {
 	var john model.User
 	db.Where("id = ?", 1).Take(&john)
@@ -25,8 +28,11 @@ func getTestUsers(db *gorm.DB) (model.User, model.User) {
 	return john, jane
 }
 
+// TestSwipeEndpointSuccessMatch validates the behaviour of the /swipe endpoint, when it is
+// provided with a valid swipe, and the swipe creates a match between the swiper and swipee,
+// i.e. the swipee was already interested in the swiper (see also: addTestSwipeMatch)
 func TestSwipeEndpointSuccessMatch(t *testing.T) {
-	testDB, cleanup := setupTestDB()
+	testDB, cleanup := SetupTestDB()
 	defer cleanup()
 	addTestSwipeMatch(testDB)
 
@@ -70,8 +76,11 @@ func TestSwipeEndpointSuccessMatch(t *testing.T) {
 	})
 }
 
+// TestSwipeEndpointSuccessMatch validates the behaviour of the /swipe endpoint, when it is
+// provided with a valid swipe, and the swipe does not create a match between the swiper and swipee,
+// i.e. the swipee had either never swiped the swiper, or had swiped interested=false.
 func TestSwipeEndpointSuccessNoMatch(t *testing.T) {
-	testDB, cleanup := setupTestDB()
+	testDB, cleanup := SetupTestDB()
 	defer cleanup()
 
 	router := SetupRouter()

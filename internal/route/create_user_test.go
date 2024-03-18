@@ -10,8 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestUserCreateEndpoint validates the behaviour of the /user/create endpoint.
+// When a GET request is received, a new random user is created, inserted to the DB
+// and returned to the caller in JSON form.
 func TestUserCreateEndpoint(t *testing.T) {
-	testDB, cleanup := setupTestDB()
+	testDB, cleanup := SetupTestDB()
 	defer cleanup()
 	router := SetupRouter()
 	w := httptest.NewRecorder()
@@ -33,6 +36,7 @@ func TestUserCreateEndpoint(t *testing.T) {
 	})
 
 	t.Run("inserts user into DB", func(t *testing.T) {
+		// TODO this does not test if a user is inserted
 		var JohnSmith model.User
 		testDB.First(&JohnSmith)
 		assert.Equal(t, "john@smith.com", JohnSmith.Email, "Expected the test user John Smith to be present in db")

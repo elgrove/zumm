@@ -12,8 +12,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestLoginEndpointSuccess validates the behaviour of the /login endpoint. When a valid
+// email/password pair is provided, a JWT is issued with claims linked to the requesting user.
 func TestLoginEndpointSuccess(t *testing.T) {
-	_, cleanup := setupTestDB()
+	_, cleanup := SetupTestDB()
 	defer cleanup()
 	router := SetupRouter()
 	w := httptest.NewRecorder()
@@ -49,8 +51,10 @@ func TestLoginEndpointSuccess(t *testing.T) {
 	})
 }
 
+// TestLoginEndpointFailure validates the behaviour of the /login endpoint. When an invalid
+// email/password pair is provided, the response contains a HTTP 401.
 func TestLoginEndpointFailure(t *testing.T) {
-	_, cleanup := setupTestDB()
+	_, cleanup := SetupTestDB()
 	defer cleanup()
 	router := SetupRouter()
 	w := httptest.NewRecorder()

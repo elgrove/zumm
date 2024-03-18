@@ -10,10 +10,11 @@ import (
 	"gorm.io/gorm"
 )
 
+// createTestUser is used to create standard test users, rather than totally random.
 func createTestUser(firstname, lastname string, male bool) model.User {
 	location := model.UserLocation{Latitude: 51.5080, Longitude: -0.11758}
 	gender := "Male"
-	if male == false {
+	if !male {
 		gender = "Female"
 	}
 	user := model.User{
@@ -27,6 +28,8 @@ func createTestUser(firstname, lastname string, male bool) model.User {
 	return user
 }
 
+// addTestUsers is used to add a pair of standard test users to the database.
+// As opposed to random users, these are static and can be used to test swipes and matches.
 func addTestUsers(db *gorm.DB) {
 	user1 := createTestUser("John", "Smith", true)
 	db.Create(&user1)
@@ -34,16 +37,25 @@ func addTestUsers(db *gorm.DB) {
 	db.Create(&user2)
 }
 
+// addRandomUsers generates and inserts CreateRandomUser users to the database.
 func addRandomUsers(db *gorm.DB, count int) {
 	randomUsers := make([]model.User, 0, count)
 	for i := 0; i < count; i++ {
-		user := model.CreateRandomUser()
+		user := CreateRandomUser()
 		randomUsers = append(randomUsers, user)
 	}
 	db.Create(&randomUsers)
 }
 
-func setupTestDB() (*gorm.DB, func()) {
+// setDB is a helper function which sets the global var models.DB and can be used to patch
+// the production DB with a test one.
+func setDB(db *gorm.DB) {
+	model.DB = db
+}
+
+// SetupTestDB returns an inmemory sqlite database pre-populated with test and random users.
+// It also handles cleanup of the database after each test and subtest has completed.
+func SetupTestDB() (*gorm.DB, func()) {
 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	if err != nil {
 		panic("failed to create inmemory test db")
@@ -51,7 +63,7 @@ func setupTestDB() (*gorm.DB, func()) {
 	db.AutoMigrate(&model.User{}, &model.Swipe{})
 	addTestUsers(db)
 	addRandomUsers(db, 500)
-	model.SetDB(db)
+	setDB(db)
 
 	cleanup := func() {
 		sqlDB, _ := db.DB()
@@ -61,10 +73,13 @@ func setupTestDB() (*gorm.DB, func()) {
 	return db, cleanup
 }
 
+// getTokenHeaderForUser is a helper function that takes a model.User and returns
+// a header string (including `Bearer `) that can be used to sign a request with JWT linked
+// to the user.
 func getTokenHeaderForUser(u model.User) string {
 	claims := model.UserClaims{jwt.RegisteredClaims{}, u}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(JWTSecretKey)
+	tokenString, _ := token.SignedString(JWTokenSecretKey)
 	tokenHeader := fmt.Sprintf("Bearer %s", tokenString)
 	return tokenHeader
 }

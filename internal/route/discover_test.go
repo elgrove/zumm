@@ -12,8 +12,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestDiscoverEndpointSuccess validates the behaviour of the /discover endpoint,
+// when given a valid Bearer token.
+// We expect that the response DiscoverUserProfiles will be sorted by nearest first as
+// well as filtered by the supplied age and gender.
 func TestDiscoverEndpointSuccess(t *testing.T) {
-	_, cleanup := setupTestDB()
+	_, cleanup := SetupTestDB()
 	defer cleanup()
 	router := SetupRouter()
 	w := httptest.NewRecorder()
@@ -63,6 +67,8 @@ func TestDiscoverEndpointSuccess(t *testing.T) {
 
 }
 
+// TestDiscoverEndpointSuccess validates the behaviour of the /discover endpoint,
+// when given a invalid Bearer token.
 func TestDiscoverEndpointFailure(t *testing.T) {
 	router := SetupRouter()
 	w := httptest.NewRecorder()

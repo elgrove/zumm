@@ -10,6 +10,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// DiscoverHandler provides a HTTP interface to discover other users of the application.
+// It returns a JSON array containing all other users of the app, minus the calling user,
+// with the users sorted by the shortest distance to the calling user.
+// The endpoint also offers functionality to filter the returned users by age and gender
+// and these filter points are to be included in the payload.
 func DiscoverHandler(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
 	var requestData model.DiscoverRequest
@@ -18,6 +23,7 @@ func DiscoverHandler(c echo.Context) error {
 
 	var callingUser model.User
 	model.DB.Take(&callingUser, "email = ?", claims.User.Email)
+
 	var possibleDiscoverUsers []model.User
 	model.DB.
 		Where("ID <> ?", callingUser.ID).

@@ -1,3 +1,4 @@
+// Package model defines the database and API request/response models for the application.
 package model
 
 import (
@@ -7,6 +8,8 @@ import (
 
 var DB *gorm.DB
 
+// ConnectDatabase opens a connection to a database, ensures the model schema is migrated
+// and sets the global var `DB` to hold the open connection.
 func ConnectDatabase() {
 	database, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 
@@ -20,8 +23,4 @@ func ConnectDatabase() {
 	}
 
 	DB = database
-}
-
-func SetDB(db *gorm.DB) {
-	DB = db
 }

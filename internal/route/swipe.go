@@ -10,6 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
+// SwipeHandler provides a HTTP interface to register a swipe, i.e. one user's
+// verdict on if they are interested in another user or not.
+// The Swipe is inserted and th
 func SwipeHandler(c echo.Context) error {
 	var swipe model.Swipe
 	c.Bind(&swipe)
@@ -21,6 +24,9 @@ func SwipeHandler(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	model.DB.Create(&swipe)
+
+	// TODO this block should be conditional on if the swipe received was interested true
+	// if swipe was not interested true, don't contact the db, just return 200 match false
 	var matchedSwipe model.Swipe
 	result := model.DB.
 		Where("swiper_id = ?", swipe.SwiperID).
@@ -28,6 +34,7 @@ func SwipeHandler(c echo.Context) error {
 		Where("interested = ?", true).
 		First(&matchedSwipe)
 	var swipeResult model.SwipeResult
+
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		swipeResult = model.SwipeResult{Matched: false}
 
