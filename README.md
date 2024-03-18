@@ -1,6 +1,6 @@
 # Zumm Technical Exercise
 
-This application is deployed at https://lgrv.net
+This application is deployed at https://lgrv.net. To run it locally, simply clone this repo and run `(sudo) docker compose up -d`.
 
 ## Background
 
