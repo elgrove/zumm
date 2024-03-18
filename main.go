@@ -12,5 +12,5 @@ func main() {
 	middleware.StartLogger()
 	model.ConnectDatabase()
 	e := route.SetupRouter()
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":80"))
 }
