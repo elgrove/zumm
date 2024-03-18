@@ -8,7 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// JWTokenSecretKey stores the secret key used to encrypt and decrypt JWTs
+// JWTokenSecretKey stores the secret key used to encrypt and decrypt JWTs.
+// Obviously this is an egrigeous security risk, the key should be injected as an env var.
 var JWTokenSecretKey = []byte("tottenhamhotspurfootballclub")
 
 // JWTokenConfig provides the configuration for our JWT middleware using echojwt.

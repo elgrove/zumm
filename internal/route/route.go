@@ -9,6 +9,7 @@ import (
 )
 
 func SetupRouter() *echo.Echo {
+	middleware.StartLogger()
 	e := echo.New()
 	configureRoutes(e)
 	return e

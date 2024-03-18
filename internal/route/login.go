@@ -1,6 +1,7 @@
 package route
 
 import (
+	"fmt"
 	"net/http"
 	"zumm/internal/middleware"
 	"zumm/internal/model"
@@ -23,7 +24,7 @@ func LoginHandler(c echo.Context) error {
 	result := model.DB.Take(&user, "email = ?", login.Email)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			middleware.Logger.Error("/login email address %s not found", login.Email)
+			middleware.Logger.Error(fmt.Sprintf("/login email address %s not found", login.Email))
 			return c.NoContent(http.StatusUnauthorized)
 		}
 		return c.NoContent(http.StatusInternalServerError)
@@ -35,9 +36,9 @@ func LoginHandler(c echo.Context) error {
 
 	claims := model.UserClaims{jwt.RegisteredClaims{}, user}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, _ := token.SignedString(JWTokenSecretKey)
+	t, _ := token.SignedString(middleware.JWTokenSecretKey)
 
 	response := model.LoginResponse{Token: t}
-	middleware.Logger.Debug("/login successful for user %s", user.ID)
+	middleware.Logger.Debug(fmt.Sprintf("/login successful for user %d", user.ID))
 	return c.JSON(http.StatusOK, response)
 }

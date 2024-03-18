@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"strings"
+	"zumm/internal/middleware"
 	"zumm/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -79,7 +80,7 @@ func SetupTestDB() (*gorm.DB, func()) {
 func getTokenHeaderForUser(u model.User) string {
 	claims := model.UserClaims{jwt.RegisteredClaims{}, u}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(JWTokenSecretKey)
+	tokenString, _ := token.SignedString(middleware.JWTokenSecretKey)
 	tokenHeader := fmt.Sprintf("Bearer %s", tokenString)
 	return tokenHeader
 }
