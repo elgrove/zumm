@@ -45,6 +45,12 @@ GORM seems to be the SQL Alchemy of the Go world and was an easy choice for the 
 
 The production systems I've worked on in the past have all used AWS IAM for authentication. However, I have a good understanding of encryption and reading the requirements it seemed to me to require symmetrical encryption and decryption with a private secret. JWT is a ubiquitous implementation of symmetrical encryption, and the Echo framework has JWT middleware built in.
 
+### Conventions
+
+The built-in Go formatter is great and hides a multitude of sins, but despite that I am absolutely certain this project contains unidiomatic and unconventional Go code. 
+
+However, as an example of my general attitude to conventions, I have used [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) throughout.
+
 ## Roadmap
 
 So much of this application is unfinished with regards to normal engineering practice. By way of example, the JWT secret is stored in plain text, and so are the user passwords!
