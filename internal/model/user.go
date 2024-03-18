@@ -6,8 +6,8 @@ import (
 
 // UserLocation represents a user location in lat/long co-ordinates.
 type UserLocation struct {
-	Latitude  float64
-	Longitude float64
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 // User represents a user of the application and holds data about them as well as their
