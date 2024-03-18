@@ -5,7 +5,7 @@ TODO
 - [x] refactor folders
 - [x] docstrings
 - [x] actual run for real locally
-- [ ] dockerise
+- [x] dockerise
 - [ ] deploy to lgrv.net
 - [ ] cicd to deploy from main?
 - [ ] documentation/readme

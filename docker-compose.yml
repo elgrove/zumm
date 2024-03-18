@@ -23,4 +23,7 @@ services:
       interval: 2s
       timeout: 60s
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - zumm_postgres:/var/lib/postgresql/data
+
+volumes:
+  zumm_postgres:
