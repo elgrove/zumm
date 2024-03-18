@@ -2,7 +2,9 @@ package route
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"zumm/internal/middleware"
 	"zumm/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -16,11 +18,13 @@ import (
 func SwipeHandler(c echo.Context) error {
 	var swipe model.Swipe
 	c.Bind(&swipe)
+	middleware.Logger.Debug(fmt.Sprintf("Request received to /swipe. User %d on user %d, interested = %t", swipe.SwiperID, swipe.SwipeeID, swipe.Interested))
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(*model.UserClaims)
 	var callingUser model.User
 	model.DB.Take(&callingUser, "id = ?", claims.User.ID)
 	if swipe.SwiperID != callingUser.ID {
+		middleware.Logger.Debug("Bad request. Swiper ID does not match bearer token.")
 		return c.NoContent(http.StatusBadRequest)
 	}
 	model.DB.Create(&swipe)
@@ -36,10 +40,12 @@ func SwipeHandler(c echo.Context) error {
 	var swipeResult model.SwipeResult
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		middleware.Logger.Debug(fmt.Sprintf("Swipe %d registered, no match", swipe.ID))
 		swipeResult = model.SwipeResult{Matched: false}
 
 	} else {
-		swipeResult = model.SwipeResult{Matched: true, MatchID: &matchedSwipe.SwipeeID}
+		middleware.Logger.Debug(fmt.Sprintf("Swipe %d registered, user %d matched with user %d", swipe.ID, swipe.SwiperID, swipe.SwipeeID))
+		swipeResult = model.SwipeResult{Matched: true, MatchID: &swipe.SwipeeID}
 	}
 
 	swipeResponse := model.SwipeResponse{Results: swipeResult}

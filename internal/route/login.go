@@ -2,6 +2,7 @@ package route
 
 import (
 	"net/http"
+	"zumm/internal/middleware"
 	"zumm/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,17 +16,20 @@ func LoginHandler(c echo.Context) error {
 	var login model.LoginRequest
 	err := c.Bind(&login)
 	if err != nil {
+		middleware.Logger.Error("/login payload does not conform to LoginRequest")
 		return c.String(http.StatusBadRequest, "bad request")
 	}
 	var user model.User
 	result := model.DB.Take(&user, "email = ?", login.Email)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
+			middleware.Logger.Error("/login email address %s not found", login.Email)
 			return c.NoContent(http.StatusUnauthorized)
 		}
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	if user.Password != login.Password {
+		middleware.Logger.Error("/login password does not match")
 		return c.NoContent(http.StatusUnauthorized)
 	}
 
@@ -34,5 +38,6 @@ func LoginHandler(c echo.Context) error {
 	t, _ := token.SignedString(JWTokenSecretKey)
 
 	response := model.LoginResponse{Token: t}
+	middleware.Logger.Debug("/login successful for user %s", user.ID)
 	return c.JSON(http.StatusOK, response)
 }

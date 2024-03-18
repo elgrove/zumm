@@ -3,14 +3,10 @@
 package route
 
 import (
-	"zumm/internal/model"
+	"zumm/internal/middleware"
 
-	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
-
-var JWTokenSecretKey = []byte("tottenhamhotspurfootballclub")
 
 func SetupRouter() *echo.Echo {
 	e := echo.New()
@@ -18,19 +14,8 @@ func SetupRouter() *echo.Echo {
 	return e
 }
 
-func JWTokenConfig() echojwt.Config {
-	config := echojwt.Config{
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(model.UserClaims)
-		},
-		SigningKey: JWTokenSecretKey,
-	}
-	return config
-}
-
 func configureRoutes(e *echo.Echo) {
-	jwtMiddleware := echojwt.WithConfig(JWTokenConfig())
-
+	jwtMiddleware := middleware.JWTMiddleware()
 	e.GET("/", CanaryHandler)
 	e.GET("/user/create", UserCreateHandler)
 	e.POST("/login", LoginHandler)

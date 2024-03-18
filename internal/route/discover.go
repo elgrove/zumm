@@ -2,9 +2,9 @@ package route
 
 import (
 	"fmt"
-	"log/slog"
 	"net/http"
 	"sort"
+	"zumm/internal/middleware"
 	"zumm/internal/model"
 
 	"github.com/LucaTheHacker/go-haversine"
@@ -22,7 +22,7 @@ func DiscoverHandler(c echo.Context) error {
 	var requestData model.DiscoverRequest
 	c.Bind(&requestData)
 	claims := token.Claims.(*model.UserClaims)
-	slog.Debug(fmt.Sprintf("Requested received to /discover from user %d", claims.User.ID))
+	middleware.Logger.Debug(fmt.Sprintf("Requested received to /discover from user %d", claims.User.ID))
 	var callingUser model.User
 	model.DB.Take(&callingUser, "email = ?", claims.User.Email)
 
@@ -66,7 +66,7 @@ func DiscoverHandler(c echo.Context) error {
 		}
 		discoverUserProfiles = append(discoverUserProfiles, discoverProfile)
 	}
-
+	middleware.Logger.Debug(fmt.Sprintf("Serving %d discover profiles to user %d", len(discoverUserProfiles), claims.User.ID))
 	return c.JSON(http.StatusOK, echo.Map{"results": discoverUserProfiles})
 
 }

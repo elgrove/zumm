@@ -4,7 +4,7 @@ TODO
 - [ ] logging, structured log output (echo framework logger?)
 - [x] refactor folders
 - [x] docstrings
-- [ ] actual run for real locally
+- [x] actual run for real locally
 - [ ] dockerise
 - [ ] deploy to lgrv.net
 - [ ] cicd to deploy from main?

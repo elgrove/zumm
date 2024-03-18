@@ -2,8 +2,8 @@ package route
 
 import (
 	"fmt"
-	"log/slog"
 	"net/http"
+	"zumm/internal/middleware"
 	"zumm/internal/model"
 
 	"github.com/brianvoe/gofakeit/v7"
@@ -30,10 +30,10 @@ func CreateRandomUser() model.User {
 // UserCreateHandler provides a HTTP interface to create a random user using the
 // CreateRandomUser function and return it in JSON format.
 func UserCreateHandler(c echo.Context) error {
-	slog.Debug("Requested received to /user/create")
+	middleware.Logger.Debug("Requested received to /user/create")
 	user := CreateRandomUser()
 	model.DB.Create(&user)
-	slog.Debug(fmt.Sprintf("Created user %d", user.ID))
+	middleware.Logger.Debug(fmt.Sprintf("Created user %d", user.ID))
 	// TODO return {result : {user}}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"id":       user.ID,
