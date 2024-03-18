@@ -13,7 +13,7 @@ I used TDD throughout which really helped me encode the requirements, get the ap
 
 ## Application
 
-### Framework
+### Framework
 
 Initially I began with Gin as it seemed to be the simplest way to get the app going and satisfy the test I'd written for the canary endpoint. However, further down the line, after having already implemented JWT 'manually', I refactored to use Echo, mostly because it had JWT middleware built-in
 
@@ -49,7 +49,7 @@ The production systems I've worked on in the past have all used AWS IAM for auth
 
 The built-in Go formatter is great and hides a multitude of sins, but despite that I am absolutely certain this project contains unidiomatic and unconventional Go code. 
 
-However, as an example of my general attitude to conventions, I have used [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) throughout.
+However, as an example of my general attitude to conventions, I have used [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) throughout. I've also used a trunk development branch and squashed my commits when I merge a PR into the main branch.
 
 ## Roadmap
 
