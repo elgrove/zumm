@@ -1,6 +1,6 @@
 # Zumm Technical Exercise
 
-This application is deployed at https://lgrv.net
+This application is deployed at https://zumm.lgrv.net
 
 ## Background
 
